@@ -34,17 +34,16 @@ func getProducts(db *sql.DB) ([]product, error) {
 	return products, nil
 }
 
-func getProductByID(db *sql.DB, id int) (*product, error) {
+func (p *product) getProductByID(db *sql.DB) error {
 	query := "SELECT id, name, quantity, price FROM products WHERE id = $1"
-	row := db.QueryRow(query, id)
+	row := db.QueryRow(query, p.ID)
 
-	var p product
 	err := row.Scan(&p.ID, &p.Name, &p.Quantity, &p.Price)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &p, nil
+	return nil
 }
 
 func (p *product) createProduct(db *sql.DB) error {

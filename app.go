@@ -64,7 +64,9 @@ func (app *App) getProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, err := getProductByID(app.Db, id)
+	p := product{ID: id}
+
+	err = p.getProductByID(app.Db)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -75,7 +77,7 @@ func (app *App) getProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendResponse(w, http.StatusOK, product)
+	sendResponse(w, http.StatusOK, p)
 }
 
 func (app *App) createProduct(w http.ResponseWriter, r *http.Request) {
