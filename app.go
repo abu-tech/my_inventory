@@ -95,7 +95,7 @@ func (app *App) createProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendResponse(w, http.StatusOK, p)
+	sendResponse(w, http.StatusCreated, p)
 }
 
 func (app *App) updateProduct(w http.ResponseWriter, r *http.Request) {

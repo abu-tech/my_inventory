@@ -1,4 +1,4 @@
-module github.com/abu-tech/go_api
+module github.com/abu-tech/my_inventory
 
 go 1.22.4
 
