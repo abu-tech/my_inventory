@@ -81,7 +81,7 @@ func (app *App) getProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) createProduct(w http.ResponseWriter, r *http.Request) {
-	var p product
+	p := product{}
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
@@ -107,7 +107,7 @@ func (app *App) updateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p product
+	p := product{ID: id}
 
 	err = json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
@@ -115,7 +115,6 @@ func (app *App) updateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p.ID = id
 	err = p.updateProduct(app.Db)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
