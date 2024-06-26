@@ -1,10 +1,4 @@
 name: Continuous Integration
-env:
-  DB_USER: postgres
-  DB_PASSWORD: postgres
-  DB_HOST: localhost
-  DB_PORT: 5432
-  DB_NAME: test_db
 on:
   push:
     branches: [main]
@@ -49,7 +43,11 @@ jobs:
 
       - name: Run tests
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: test_db
         run: go test ./... -v
 
     # Optional: Add a step to run migrations if needed
