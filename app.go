@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -18,11 +20,31 @@ type App struct {
 }
 
 func (app *App) Initialize() error {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=require", DbUser, DbPassword, Host, Port, Dbname)
-	var err error
+	// Load environment variables with fallback values
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file, falling back to environment variables")
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	// Construct the database connection string
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=require",
+		dbUser, dbPassword, dbHost, dbPort, dbName)
+
 	app.Db, err = sql.Open("postgres", dsn)
 	if err != nil {
-		return err
+		return fmt.Errorf("error opening database: %w", err)
+	}
+
+	// Test the database connection
+	err = app.Db.Ping()
+	if err != nil {
+		return fmt.Errorf("error connecting to the database: %w", err)
 	}
 
 	app.Router = mux.NewRouter().StrictSlash(true)
