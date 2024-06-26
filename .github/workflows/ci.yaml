@@ -1,0 +1,27 @@
+name: Continious Integeration
+on: push
+jobs: 
+  run_code_checks:
+    runs-on: ubuntu-latest
+    steps: 
+     -name: Set up Database
+      run: | 
+       sudo /etc/init.d/mysql start
+       sudo mysql -e 'CREATE DATABASE my_inventory' -uroot -proot
+
+     -name: Checkout Repo Code
+      uses: actions/checkout@v2
+      
+     -name: Set up Go
+      uses: actiond/checkout@v2
+      with: 
+       go-version: 1.22.4
+
+     -name: Run linting
+      run: |
+       go fmt ./...
+       go vet ./...
+       
+     -name: Run tests
+      run: go test 
+
