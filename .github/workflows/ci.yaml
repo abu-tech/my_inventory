@@ -1,21 +1,41 @@
-name: Continious Integeration
-on: push
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   run_code_checks:
     runs-on: ubuntu-latest
-    steps:
-      - name: Set up Database
-        run: |
-          sudo /etc/init.d/mysql start
-          sudo mysql -e 'CREATE DATABASE my_inventory' -uroot -proot
 
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
       - name: Checkout Repo Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actiond/checkout@v2
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.22.4
+          go-version: "1.22.4"
+
+      - name: Install dependencies
+        run: go mod download
 
       - name: Run linting
         run: |
@@ -23,4 +43,12 @@ jobs:
           go vet ./...
 
       - name: Run tests
-        run: go test
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+        run: go test ./... -v
+
+    # Optional: Add a step to run migrations if needed
+    # - name: Run database migrations
+    #   run: go run ./migrations/migrate.go
+    #   env:
+    #     DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
